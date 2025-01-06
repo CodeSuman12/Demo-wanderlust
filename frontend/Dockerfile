@@ -1,31 +1,21 @@
-# ------------------- Stage 1: Build Stage ------------------------------
-FROM node:21 AS frontend-builder
+# ------------------- Stage 1: Build Stage -----------------------------
 
-# Set the working directory to /app
+FROM node:latest AS frontend-builder
+
 WORKDIR /app
 
-# Copy the package.json and package-lock.json for dependency installation
-COPY package*.json ./
-
-# Install dependencies
-RUN npm install --upgrade npm 
-# Copy the rest of the application code
 COPY . .
 
-# ------------------- Stage 2: Final Stage ------------------------------
-FROM node:21-alpine
+RUN npm install --upgrade npm
 
-# Set the working directory to /app
+# ------------------- Stage 2: Final Stage ------------------------------
+
+FROM node:alpine 
+
 WORKDIR /app
 
-# Copy built assets and dependencies from frontend-builder stage
 COPY --from=frontend-builder /app .
 
-# Copy the .env.sample file to .env.local
-COPY .env.local .env.local
+COPY  .env.local .env.local
 
-# Expose port 5173 for the Node.js application
-EXPOSE 5173
-
-# Define the default command to run the application in development mode
-CMD ["npm", "run", "dev", "--", "--host"]
+CMD ["npm","run","dev","--","--host"]
