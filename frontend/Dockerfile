@@ -1,21 +1,14 @@
-# ------------------- Stage 1: Build Stage -----------------------------
-
-FROM node:latest AS frontend-builder
+FROM node:latest 
 
 WORKDIR /app
+
+
+COPY package*.json .
+
+RUN npm install --upgrade npm
 
 COPY . .
+COPY .env.local .env.local 
 
-RUN npm install --upgrade npm 
-
-# ------------------- Stage 2: Final Stage ------------------------------
-
-FROM node:alpine 
-
-WORKDIR /app
-
-COPY --from=frontend-builder /app .
-
-COPY  .env.local .env.local
-
+EXPOSE 5173
 CMD ["npm","run","dev","--","--host"]
